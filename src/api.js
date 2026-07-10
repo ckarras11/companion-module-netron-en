@@ -43,7 +43,7 @@ module.exports = {
 				self.updateStatus(InstanceStatus.Ok);
 			}
 		}.bind(self)).on('error', function(error) {
-			self.status(InstanceStatus.Error);
+			self.updateStatus(InstanceStatus.Error);
 			self.log('error', 'Error Getting Current Cue: ' + error.toString());
 			if  (self.INTERVAL !== undefined) {
 				self.log('debug', 'Stopping Polling...');
