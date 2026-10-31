@@ -1,4 +1,6 @@
 {
+	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
+	"type": "connection",
 	"id": "netron-en",
 	"name": "netron-en",
 	"shortname": "netron",
@@ -13,21 +15,14 @@
 			"email": "josephdadams@gmail.com"
 		}
 	],
-	"legacyIds": [
-		"kipro"
-	],
+	"legacyIds": ["kipro"],
 	"runtime": {
-		"type": "node18",
+		"type": "node26",
 		"api": "nodejs-ipc",
 		"apiVersion": "0.0.0",
-		"entrypoint": "../index.js"
+		"entrypoint": "../src/main.js"
 	},
 	"manufacturer": "Netron",
-	"products": [
-		"EN",
-		"EN-12"
-	],
-	"keywords": [
-		"Lighting"
-	]
+	"products": ["EN", "EN-12"],
+	"keywords": ["Lighting"]
 }

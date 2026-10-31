@@ -1,31 +1,12 @@
-module.exports = {
-	initVariables() {
-		let variables = [];
+import { CUE_COUNT } from './config.js'
 
-		if (this.config.polling) {
-			variables.push( { variableId: 'current_cue', name: 'Current Cue Number' } );
-		}
-
-		this.setVariableDefinitions(variables);
-	},
-
-	checkVariables() {
-		let self = this;
-
-		try {
-			let variableObj = {};
-
-			if (self.config.polling) {
-				variableObj['current_cue'] = self.CURRENT_CUE;
-			}
-
-			self.setVariableValues(variableObj);
-		}
-		catch(error) {
-			//do something with that error
-			if (self.config.verbose) {
-				self.log('debug', 'Error Updating Variables: ' + error);
-			}
-		}
+export function getVariables() {
+	const variables = {
+		current_cue: { name: 'Current Cue Number' },
+		current_cue_name: { name: 'Current Cue Name' },
 	}
+	for (let i = 1; i <= CUE_COUNT; i++) {
+		variables[`cue_name_${i}`] = { name: `Cue ${i} Name` }
+	}
+	return variables
 }

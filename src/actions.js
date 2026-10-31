@@ -1,71 +1,45 @@
-module.exports = {
+import { cueNumberOption, parseCueNumber } from './options.js'
 
-	initActions() {
-		let self = this; // required to have reference to outer `this`
-		let actions = {};
-		
-		actions.runCue = {
+export function getActions(self) {
+	const cueFrom = (event) => {
+		const cue = parseCueNumber(event.options.cueNumber)
+		if (cue === null) {
+			self.log('warn', `Ignoring ${event.actionId}: invalid cue number "${event.options.cueNumber}"`)
+		}
+		return cue
+	}
+
+	return {
+		runCue: {
 			name: 'Run Cue',
 			options: [
-				{
-					type: 'number',
-					label: 'Cue Number',
-					id: 'cueNumber',
-					min: 1,
-					max: 99,
-					default: 1,
-					required: true,
-					range: false
-				},
+				cueNumberOption(self),
 				{
 					type: 'checkbox',
 					label: 'Resend Ethernet',
 					id: 'resendEthernet',
-					default: true
-				}
-
+					default: true,
+				},
 			],
-			callback: async function(event) {
-				let cmd = {
-					CueResendEth: event.options.resendEthernet ? 1 : 0,
-					RunCue: event.options.cueNumber,
-					EndFlag: 1
-				}
-				self.sendRunCueCommand(cmd);
-			}
-		}
-
-    actions.saveCue = {
-      name: 'Save Cue',
-      options: [
-        {
-          type: 'number',
-          label: 'Cue Number',
-          id: 'cueNumber',
-          min: 1,
-          max: 99,
-          default: 1,
-          required: true,
-          range: false
-        }
-      ],
-      callback: async function(event) {
-        let cmd = {
-          CueNum: event.options.cueNumber,
-          EndFlag: 1
-        }
-        self.sendSaveCueCommand(cmd);
-      }
-    }
-
-		actions.clearCue = {
+			callback: async (event) => {
+				const cue = cueFrom(event)
+				if (cue !== null) await self.runCue(cue, !!event.options.resendEthernet)
+			},
+		},
+		saveCue: {
+			name: 'Save Cue',
+			options: [cueNumberOption(self)],
+			callback: async (event) => {
+				const cue = cueFrom(event)
+				if (cue !== null) await self.saveCue(cue)
+			},
+		},
+		clearCue: {
 			name: 'Clear Cue',
 			options: [],
-			callback: async function(event) {
-				self.sendClearCueCommand();
-			}
-		};
-
-		self.setActionDefinitions(actions);
+			callback: async () => {
+				await self.clearCue()
+			},
+		},
 	}
 }
