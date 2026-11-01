@@ -1,53 +1,44 @@
-const { combineRgb } = require('@companion-module/base')
+import { combineRgb } from '@companion-module/base'
+import { CUE_COUNT } from './config.js'
 
-module.exports = {
-	initPresets() {
-		let self = this;
-		
-		const presets = [];
+export function getPresets(self) {
+	const presets = {}
+	const ids = []
 
-		for (let i = 1; i <= 99; i++) {
-			presets.push(
-			{
-				type: 'button',
-				category: 'Cues',
-				label: 'Run Cue ' + i,
-				style: {
-					text: 'Run Cue ' + i,
-					size: 'auto',
-					color: combineRgb(255, 255, 255),
-					bgcolor: combineRgb(0, 0, 0),
+	for (let i = 1; i <= CUE_COUNT; i++) {
+		const id = `runCue_${i}`
+		const cueName = self.cueNames?.[i - 1]
+		ids.push(id)
+		presets[id] = {
+			type: 'simple',
+			name: cueName && cueName !== `Cue ${i}` ? `${i}: ${cueName}` : `Run Cue ${i}`,
+			keywords: cueName ? [cueName] : undefined,
+			style: {
+				text: `$(${self.label}:cue_name_${i})`,
+				size: 'auto',
+				color: combineRgb(255, 255, 255),
+				bgcolor: combineRgb(0, 0, 0),
+			},
+			steps: [
+				{
+					down: [{ actionId: 'runCue', options: { cueNumber: i, resendEthernet: true } }],
+					up: [],
 				},
-				steps: [
-					{
-						down: [
-							{
-								actionId: 'runCue',
-								options: {
-									cueNumber: i,
-									resendEthernet: true
-								}
-							}
-						],
-						up: []
-					}
-				],
-				feedbacks: [
-					{
-						feedbackId: 'currentCue',
-						options: {
-							cueNumber: i
-						},
-						style: {
-							// The style property is only valid for 'boolean' feedbacks, and defines the style change it will have.
-							color: combineRgb(255, 255, 255),
-							bgcolor: combineRgb(255, 0, 0),
-						},
-					}
-				]
-			})
+			],
+			feedbacks: [
+				{
+					feedbackId: 'currentCue',
+					options: { cueNumber: i },
+					style: {
+						color: combineRgb(255, 255, 255),
+						bgcolor: combineRgb(255, 0, 0),
+					},
+				},
+			],
 		}
+	}
 
-		this.setPresetDefinitions(presets)
-	},
+	const structure = [{ id: 'cues', name: 'Cues', definitions: ids }]
+
+	return { structure, presets }
 }
